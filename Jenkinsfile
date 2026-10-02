@@ -8,7 +8,7 @@ pipeline {
     AWS_REGION = "ap-south-1"
 
     ECR_REGISTRY = "669749972871.dkr.ecr.ap-south-1.amazonaws.com/devops-portfolio"
-
+    }
     stages {
 
         stage('Checkout') {
@@ -16,6 +16,7 @@ pipeline {
                 checkout scm
             }
         }
+    }
 
         stage('Verify Files') {
             steps {
