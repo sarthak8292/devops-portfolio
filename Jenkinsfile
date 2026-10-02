@@ -1,14 +1,13 @@
+```groovy
 pipeline {
     agent any
 
     environment {
-
-    IMAGE_NAME = "devops-portfolio"
-
-    AWS_REGION = "ap-south-1"
-
-    ECR_REGISTRY = "669749972871.dkr.ecr.ap-south-1.amazonaws.com/devops-portfolio"
+        IMAGE_NAME = "devops-portfolio"
+        AWS_REGION = "ap-south-1"
+        ECR_REGISTRY = "669749972871.dkr.ecr.ap-south-1.amazonaws.com/devops-portfolio"
     }
+
     stages {
 
         stage('Checkout') {
@@ -16,7 +15,6 @@ pipeline {
                 checkout scm
             }
         }
-    }
 
         stage('Verify Files') {
             steps {
@@ -57,8 +55,8 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        aws ecr-public get-login-password --region ${AWS_REGION} | \
-                        docker login --username AWS --password-stdin public.ecr.aws
+                        aws ecr get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS --password-stdin ${ECR_REGISTRY}
                     '''
                 }
             }
@@ -92,7 +90,7 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        aws ecr-public describe-images \
+                        aws ecr describe-images \
                         --repository-name ${IMAGE_NAME} \
                         --region ${AWS_REGION}
                     '''
@@ -103,7 +101,7 @@ pipeline {
 
     post {
         success {
-            echo 'Image Successfully Uploaded To ECR Public'
+            echo 'Image Successfully Uploaded To ECR'
         }
 
         failure {
@@ -111,3 +109,4 @@ pipeline {
         }
     }
 }
+```
