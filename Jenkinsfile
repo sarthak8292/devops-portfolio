@@ -1,3 +1,4 @@
+```groovy
 pipeline {
     agent any
 
@@ -96,11 +97,40 @@ pipeline {
                 }
             }
         }
+
+        stage('Finally Website Launch') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-creds',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+                    sh '''
+                        aws ecr get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS --password-stdin ${ECR_REGISTRY}
+
+                        docker pull ${ECR_REGISTRY}:${BUILD_NUMBER}
+
+                        docker stop devops-app || true
+                        docker rm devops-app || true
+
+                        docker run -d \
+                            --name devops-app \
+                            -p 80:80 \
+                            ${ECR_REGISTRY}:${BUILD_NUMBER}
+
+                        docker ps
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'Image Successfully Uploaded To ECR'
+            echo 'Finally Website Launch Successfully Completed!'
         }
 
         failure {
@@ -108,4 +138,4 @@ pipeline {
         }
     }
 }
-
+```
