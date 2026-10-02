@@ -1,31 +1,22 @@
-```groovy
 pipeline {
-
     agent any
 
     environment {
-
         IMAGE_NAME   = "devops-portfolio"
-
-        AWS_REGION   = "ap-south-1"
-
-        ECR_REGISTRY = "669749972871.dkr.ecr.ap-south-1.amazonaws.com/devops-portfolio"
+        AWS_REGION   = "us-east-1"
+        ECR_REGISTRY = "public.ecr.aws/j0h7e6b5/devops-portfolio"
     }
 
     stages {
 
         stage('Checkout') {
-
             steps {
-
                 checkout scm
             }
         }
 
         stage('Verify Files') {
-
             steps {
-
                 sh '''
                     pwd
                     ls -lrt
@@ -34,15 +25,11 @@ pipeline {
         }
 
         stage('SonarQube Scan') {
-
             steps {
-
                 script {
-
                     def scannerHome = tool 'sonar-scanner'
 
                     withSonarQubeEnv('sonarqube') {
-
                         sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
@@ -50,9 +37,7 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-
             steps {
-
                 sh '''
                     docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .
                 '''
@@ -60,34 +45,24 @@ pipeline {
         }
 
         stage('ECR Login') {
-
             steps {
-
                 withCredentials([
-
                     usernamePassword(
                         credentialsId: 'aws-creds',
                         usernameVariable: 'AWS_ACCESS_KEY_ID',
                         passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                     )
-
                 ]) {
-
                     sh '''
-                        aws ecr get-login-password \
-                        --region ${AWS_REGION} | \
-                        docker login \
-                        --username AWS \
-                        --password-stdin ${ECR_REGISTRY}
+                        aws ecr-public get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS --password-stdin public.ecr.aws
                     '''
                 }
             }
         }
 
         stage('Tag Image') {
-
             steps {
-
                 sh '''
                     docker tag \
                     ${IMAGE_NAME}:${BUILD_NUMBER} \
@@ -97,32 +72,24 @@ pipeline {
         }
 
         stage('Push To ECR') {
-
             steps {
-
                 sh '''
-                    docker push \
-                    ${ECR_REGISTRY}:${BUILD_NUMBER}
+                    docker push ${ECR_REGISTRY}:${BUILD_NUMBER}
                 '''
             }
         }
 
         stage('Verify Image') {
-
             steps {
-
                 withCredentials([
-
                     usernamePassword(
                         credentialsId: 'aws-creds',
                         usernameVariable: 'AWS_ACCESS_KEY_ID',
                         passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                     )
-
                 ]) {
-
                     sh '''
-                        aws ecr describe-images \
+                        aws ecr-public describe-images \
                         --repository-name ${IMAGE_NAME} \
                         --region ${AWS_REGION}
                     '''
@@ -132,16 +99,12 @@ pipeline {
     }
 
     post {
-
         success {
-
-            echo 'Docker Image Successfully Uploaded To Private ECR'
+            echo 'Image Successfully Uploaded To ECR Public'
         }
 
         failure {
-
             echo 'Pipeline Failed'
         }
     }
 }
-```
