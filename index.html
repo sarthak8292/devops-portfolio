@@ -1,180 +1,572 @@
-#!/bin/bash
-
-yum update -y
-yum install httpd -y
-
-systemctl start httpd
-systemctl enable httpd
-
-cat << 'EOF' > /var/www/html/index.html
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Cloud</title>
+<title>GreenGuard | Save Trees Save Life</title>
 
 <style>
-
-body{
-margin:0;
-font-family:Arial;
-background:#f4f6f9;
-transition:0.4s;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    scroll-behavior:smooth;
 }
 
-header{
-background:#232f3e;
-color:white;
-padding:20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#071a12;
+    color:#fff;
+    overflow-x:hidden;
+}
+
+/* NAVBAR */
+nav{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    padding:18px 7%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    z-index:1000;
+    background:rgba(4,20,13,.72);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+    color:#7cff9b;
+}
+
+.logo span{
+    color:white;
+}
+
+nav ul{
+    display:flex;
+    gap:30px;
+    list-style:none;
 }
 
 nav a{
-color:white;
-text-decoration:none;
-margin:0 15px;
-font-weight:bold;
+    color:white;
+    text-decoration:none;
+    font-size:14px;
+    transition:.3s;
 }
 
 nav a:hover{
-color:#ff9900;
+    color:#7cff9b;
 }
 
+/* HERO */
 .hero{
-text-align:center;
-padding:120px 20px;
-background:linear-gradient(135deg,#1e90ff,#00c6ff);
-color:white;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    padding:120px 7% 70px;
+    position:relative;
+    overflow:hidden;
+    background:
+    linear-gradient(90deg,rgba(3,20,12,.95),rgba(3,20,12,.45)),
+    url("https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=2000&q=90");
+    background-size:cover;
+    background-position:center;
 }
 
-.hero button{
-padding:15px 30px;
-border:none;
-background:#ff9900;
-color:white;
-font-size:16px;
-border-radius:5px;
-cursor:pointer;
-transition:0.3s;
+.hero-content{
+    max-width:750px;
 }
 
-.hero button:hover{
-transform:scale(1.1);
-background:#ff7700;
+.badge{
+    display:inline-block;
+    padding:8px 16px;
+    border:1px solid rgba(124,255,155,.4);
+    border-radius:30px;
+    color:#7cff9b;
+    background:rgba(124,255,155,.08);
+    margin-bottom:22px;
+    font-size:13px;
 }
 
+.hero h1{
+    font-size:clamp(48px,8vw,90px);
+    line-height:.95;
+    margin-bottom:25px;
+}
+
+.hero h1 span{
+    color:#7cff9b;
+}
+
+.hero p{
+    font-size:19px;
+    line-height:1.7;
+    color:#d0ddd5;
+    max-width:650px;
+}
+
+.buttons{
+    margin-top:35px;
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    padding:14px 25px;
+    border-radius:30px;
+    text-decoration:none;
+    font-weight:bold;
+    transition:.3s;
+}
+
+.btn-primary{
+    background:#72f596;
+    color:#062010;
+}
+
+.btn-primary:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 30px rgba(114,245,150,.3);
+}
+
+.btn-outline{
+    border:1px solid rgba(255,255,255,.3);
+    color:white;
+}
+
+.btn-outline:hover{
+    border-color:#7cff9b;
+    color:#7cff9b;
+}
+
+/* STATS */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    padding:30px 7%;
+    background:#0a2418;
+}
+
+.stat{
+    text-align:center;
+    padding:25px;
+    border-right:1px solid rgba(255,255,255,.1);
+}
+
+.stat:last-child{
+    border:none;
+}
+
+.stat h2{
+    color:#7cff9b;
+    font-size:35px;
+}
+
+.stat p{
+    color:#a9b9af;
+    margin-top:6px;
+}
+
+/* COMMON */
+section{
+    padding:100px 7%;
+}
+
+.section-head{
+    max-width:700px;
+    margin-bottom:50px;
+}
+
+.section-head small{
+    color:#7cff9b;
+    text-transform:uppercase;
+    letter-spacing:3px;
+}
+
+.section-head h2{
+    font-size:48px;
+    margin:12px 0;
+}
+
+.section-head p{
+    color:#aebdb4;
+    line-height:1.7;
+}
+
+/* CARDS */
 .cards{
-display:flex;
-justify-content:center;
-gap:30px;
-padding:60px;
-flex-wrap:wrap;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
 }
 
 .card{
-background:white;
-padding:30px;
-width:250px;
-border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
-transition:0.3s;
+    background:linear-gradient(145deg,#102c1e,#0a1d14);
+    border:1px solid rgba(124,255,155,.12);
+    padding:30px;
+    border-radius:20px;
+    transition:.35s;
 }
 
 .card:hover{
-transform:translateY(-10px);
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    transform:translateY(-8px);
+    border-color:rgba(124,255,155,.45);
+}
+
+.icon{
+    font-size:38px;
+    margin-bottom:20px;
+}
+
+.card h3{
+    margin-bottom:12px;
+}
+
+.card p{
+    color:#aebdb4;
+    line-height:1.6;
+}
+
+/* MISSION */
+.mission{
+    background:#0a2418;
+}
+
+.mission-box{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:50px;
+    align-items:center;
+}
+
+.mission-image{
+    min-height:430px;
+    border-radius:25px;
+    background:
+    linear-gradient(rgba(0,30,15,.2),rgba(0,30,15,.5)),
+    url("https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1200&q=90");
+    background-size:cover;
+    background-position:center;
+}
+
+.mission-text h2{
+    font-size:48px;
+    margin:15px 0 20px;
+}
+
+.mission-text p{
+    color:#b7c5bc;
+    line-height:1.8;
+    margin-bottom:18px;
+}
+
+.check{
+    margin:14px 0;
+    color:#dce9e0;
+}
+
+.check span{
+    color:#7cff9b;
+    margin-right:10px;
+}
+
+/* CTA */
+.cta{
+    text-align:center;
+    background:
+    linear-gradient(rgba(3,35,19,.86),rgba(3,35,19,.86)),
+    url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1800&q=90");
+    background-size:cover;
+    background-position:center;
+}
+
+.cta h2{
+    font-size:55px;
+    margin-bottom:20px;
+}
+
+.cta p{
+    color:#c8d7cd;
+    max-width:650px;
+    margin:auto;
+    line-height:1.7;
 }
 
 footer{
-background:#232f3e;
-color:white;
-text-align:center;
-padding:20px;
+    background:#04110a;
+    padding:30px 7%;
+    text-align:center;
+    color:#819189;
 }
 
-.dark{
-background:#121212;
-color:white;
+footer strong{
+    color:#7cff9b;
 }
 
-.dark .card{
-background:#1e1e1e;
+/* MOBILE */
+@media(max-width:900px){
+    nav ul{
+        display:none;
+    }
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .mission-box{
+        grid-template-columns:1fr;
+    }
 }
 
+@media(max-width:600px){
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .stat{
+        border-right:none;
+        border-bottom:1px solid rgba(255,255,255,.1);
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .section-head h2,
+    .mission-text h2{
+        font-size:36px;
+    }
+
+    .cta h2{
+        font-size:38px;
+    }
+}
 </style>
-
 </head>
 
 <body>
 
-<header>
-
-<h2>AWS Static Site</h2>
-
+<!-- NAVBAR -->
 <nav>
+    <div class="logo">🌿 Green<span>Guard</span></div>
 
-<a href="#">Home</a>
-<a href="#services">Services</a>
-<a href="#about">About</a>
-
+    <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#why">Why Trees</a></li>
+        <li><a href="#mission">Mission</a></li>
+        <li><a href="#action">Take Action</a></li>
+    </ul>
 </nav>
 
-<button onclick="toggleMode()">🌙</button>
 
-</header>
+<!-- HERO -->
+<section class="hero" id="home">
 
-<section class="hero">
+    <div class="hero-content">
 
-<h1>AWS 🚀 DevOps</h1>
+        <div class="badge">
+            🌍 Protecting Our Planet
+        </div>
 
-<p>Running on AWS</p>
+        <h1>
+            Save Trees.<br>
+            Save <span>Life.</span>
+        </h1>
 
-<button onclick="showMessage()">Test Interaction</button>
+        <p>
+            Forests are more than trees. They are homes for wildlife,
+            protectors of our climate and the foundation of life on Earth.
+        </p>
+
+        <div class="buttons">
+            <a href="#action" class="btn btn-primary">
+                🌱 Take Action
+            </a>
+
+            <a href="#why" class="btn btn-outline">
+                Discover More →
+            </a>
+        </div>
+
+    </div>
 
 </section>
 
-<section id="services" class="cards">
 
-<div class="card">
-<h3>Cloud Hosting</h3>
-<p>AWS EC2 + Apache Web Server</p>
+<!-- STATS -->
+<div class="stats">
+
+    <div class="stat">
+        <h2>🌳</h2>
+        <p>Protect Forests</p>
+    </div>
+
+    <div class="stat">
+        <h2>💧</h2>
+        <p>Protect Water</p>
+    </div>
+
+    <div class="stat">
+        <h2>🌍</h2>
+        <p>Protect Earth</p>
+    </div>
+
 </div>
 
-<div class="card">
-<h3>Fast Delivery</h3>
-<p>Can integrate CloudFront CDN</p>
-</div>
 
-<div class="card">
-<h3>DevOps Ready</h3>
-<p>CI/CD deployment possible</p>
-</div>
+<!-- WHY TREES -->
+<section id="why">
+
+    <div class="section-head">
+
+        <small>Why It Matters</small>
+
+        <h2>
+            Nature gives us everything.
+        </h2>
+
+        <p>
+            Healthy forests support life, regulate climate,
+            protect biodiversity and help communities thrive.
+        </p>
+
+    </div>
+
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="icon">🌬️</div>
+            <h3>Clean Air</h3>
+            <p>
+                Trees absorb carbon dioxide and help maintain
+                cleaner air for people and wildlife.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="icon">🐘</div>
+            <h3>Wildlife</h3>
+            <p>
+                Forests provide natural habitats for animals,
+                birds and countless species.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="icon">💧</div>
+            <h3>Water Cycle</h3>
+            <p>
+                Forests help maintain rainfall, groundwater
+                and healthy ecosystems.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="icon">🌡️</div>
+            <h3>Climate</h3>
+            <p>
+                Trees store carbon and play an important role
+                in reducing climate impacts.
+            </p>
+        </div>
+
+    </div>
 
 </section>
 
+
+<!-- MISSION -->
+<section class="mission" id="mission">
+
+    <div class="mission-box">
+
+        <div class="mission-image"></div>
+
+        <div class="mission-text">
+
+            <small style="color:#7cff9b;letter-spacing:3px;">
+                OUR MISSION
+            </small>
+
+            <h2>
+                A greener future starts today.
+            </h2>
+
+            <p>
+                Protecting forests is not only about planting trees.
+                It is about protecting ecosystems, wildlife,
+                water resources and future generations.
+            </p>
+
+            <div class="check">
+                <span>✓</span> Plant and protect trees
+            </div>
+
+            <div class="check">
+                <span>✓</span> Reduce unnecessary paper waste
+            </div>
+
+            <div class="check">
+                <span>✓</span> Protect natural habitats
+            </div>
+
+            <div class="check">
+                <span>✓</span> Spread environmental awareness
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CTA -->
+<section class="cta" id="action">
+
+    <h2>
+        Be part of the change. 🌱
+    </h2>
+
+    <p>
+        Every small action matters. Plant a tree, protect a forest
+        and inspire someone else to care for our planet.
+    </p>
+
+    <div class="buttons" style="justify-content:center;">
+
+        <a href="#home" class="btn btn-primary">
+            🌳 Start Today
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
 <footer>
 
-<p>© 2026 AWS </p>
+    <p>
+        © 2026 <strong>GreenGuard</strong> |
+        Save Trees • Save Forests • Save Life 🌿
+    </p>
 
 </footer>
 
-<script>
-
-function showMessage(){
-alert("🎉 You are in AWS DevOps Class!");
-}
-
-function toggleMode(){
-document.body.classList.toggle("dark");
-}
-
-</script>
-
 </body>
 </html>
-EOF
+```
+
+
+
